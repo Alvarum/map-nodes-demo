@@ -1,6 +1,12 @@
 
+/**
+ * DetectionPoint: representa un punto de detección.
+ * - id: ID del doc en Firestore
+ * - name: nombre de raptor
+ * - lat/lng: coordenadas en grados decimales
+ * - neighbors: lista de nombres de raptor de los vecinos
+ */
 export interface DetectionPoint {
-    // Representa un punto de detección
     id: string;
     name: string;
     lat: number;
@@ -8,6 +14,13 @@ export interface DetectionPoint {
     neighbors: string[];
 }
 
+
+/**
+ * Edge: representa una arista.
+ * - a/b: representan los nodos de la arista
+ *  - id: ID del doc en Firestore
+ *  - lat/lng: coordenadas en grados decimales
+ */
 export interface Edge {
     // Representa una arista
     a: {
@@ -20,4 +33,16 @@ export interface Edge {
         lat: number;
         lng: number;
     };
+}
+
+/**
+ * graphSnapshot: Representa el estado del grafo para guardar en cache
+ * - version: versión del snapshot
+ * - createdAt: fecha de creación
+ * - points: puntos de detección con sus vecinos
+ */
+export interface GraphSnapshot {
+  version: number;
+  createdAt: string; // new Date().toISOString()
+  points: DetectionPoint[];
 }

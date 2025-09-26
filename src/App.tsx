@@ -10,41 +10,28 @@ function App() {
   // sacar las credenciales del env
   const userMail: string = import.meta.env.VITE_FIREBASE_AUTH_EMAIL;
   const userPass: string = import.meta.env.VITE_FIREBASE_AUTH_PASSWORD;
-  console.log({ userMail, userPass });
 
-  // useEffect(() => {
-  //   console.log("Intentando iniciar sesión 1");
-  //   (async () => {
-  //     try {
-  //       console.log("Intentando iniciar sesión 2");
-  //       console.log({ userMail, userPass });
-  //       await loginWithEmail(userMail, userPass);
-  //       setReady(true);
-  //     } catch (e) {
-  //       setAuthErr(e as Error);
-  //     }
-  //   })();
-  // }, []);
+  useEffect(() => {
+    (async () => {
+      try {
+        await loginWithEmail(userMail, userPass);
+        setReady(true);
+      } catch (e) {
+        setAuthErr(e as Error);
+      }
+    })();
+  }, []);
 
-  const buttonLogin = async() => {
-    try {
-      await loginWithEmail(userMail, userPass);
-      setReady(true);
-    } catch (e) {
-      setAuthErr(e as Error);
-    }
-  }
-
-  //const { points, edges, loading, error } = useGraph();
-  //console.log({ points, edges, loading, error });
+  const { points, edges, loading, error } = useGraph();
+  console.log({ points, edges, loading, error });
 
   if (authErr) return <div>Error de login: {String(authErr.message || authErr)}</div>;
   //if (!ready) return <div>Iniciando sesión…</div>;
 
   return (
     <div className="App">
-      <button onClick={buttonLogin}>Login</button>
-      <h1>Grid Guardian - Mapa de Puntos</h1>
+      {/* <button onClick={buttonLogin}>Login</button>
+      <h1>Grid Guardian - Mapa de Puntos</h1> */}
     </div>
   );
 }

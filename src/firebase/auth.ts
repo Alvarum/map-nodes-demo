@@ -13,26 +13,13 @@ export const auth = getAuth(app);
  * @returns
  */
 export async function loginWithEmail(email: string, password: string): Promise<User> {
+  if (!auth) throw new Error("Problema con el auth");
 
-  try {
-    const cred = await signInWithEmailAndPassword(auth, email, password);
-    console.log("Login OK:", cred.user);
-    return cred.user;
-  } catch (error: any) {
-    console.error("Error al iniciar sesión:", error.code, error.message);
-    throw error;
-  }
+  const cred: UserCredential = await signInWithEmailAndPassword(auth, email, password);
+  console.log({ cred });
 
-  // // Intenta iniciar sesión
-  // console.log("Intentando iniciar sesión: ", { email, password });
+  // Si no se pudo iniciar sesión, lanza un error
+  if (!cred.user) throw new Error("No se pudo iniciar sesión");
 
-  // if (!auth) throw new Error("Problema con el auth");
-
-  // const cred: UserCredential = await signInWithEmailAndPassword(auth, email, password);
-  // console.log({ cred });
-
-  // // Si no se pudo iniciar sesión, lanza un error
-  // if (!cred.user) throw new Error("No se pudo iniciar sesión");
-
-  // return cred.user;
+  return cred.user;
 }

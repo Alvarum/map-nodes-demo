@@ -22,7 +22,6 @@ export interface DetectionPoint {
  *  - lat/lng: coordenadas en grados decimales
  */
 export interface Edge {
-    // Representa una arista
     a: {
         id: string;
         lat: number;
@@ -35,8 +34,9 @@ export interface Edge {
     };
 }
 
+
 /**
- * graphSnapshot: Representa el estado del grafo para guardar en cache
+ * Representa el estado del grafo para guardar en cache
  * - version: versión del snapshot
  * - createdAt: fecha de creación
  * - points: puntos de detección con sus vecinos
@@ -45,4 +45,13 @@ export interface GraphSnapshot {
   version: number;
   createdAt: string; // new Date().toISOString()
   points: DetectionPoint[];
+}
+
+
+export interface MapGraphProps {
+  points: DetectionPoint[];
+  edges: Edge[];
+  showPoints?: boolean;
+  showEdges?: boolean;
+  fitOnLoad?: boolean;
 }

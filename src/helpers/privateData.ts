@@ -3,14 +3,12 @@
 import type { FirebaseOptions } from "firebase/app";
 import { env, toSegments } from "./env.ts"
 
-
 // convierte a segmentos
 const detectionPointsStr: string = env(
-    "VITE_FIRESTORE_PATH_DETECTION_POINTS",
+    "VITE_DETECTION_POINTS",
     "string"
 );
 const detectionPoints = toSegments(detectionPointsStr);
-
 
 //Configuración de Firebase
 export const FIREBASE_CONFIG: FirebaseOptions = {
@@ -20,6 +18,7 @@ export const FIREBASE_CONFIG: FirebaseOptions = {
   appId: env('VITE_FIREBASE_APP_ID'),
 };
 
+// Credenciales de autenticación en desarrollo (las propias)
 export const DEV_AUTH = Object.freeze({
   email: env('VITE_FIREBASE_AUTH_EMAIL'),
   password: env('VITE_FIREBASE_AUTH_PASSWORD'),
@@ -28,4 +27,9 @@ export const DEV_AUTH = Object.freeze({
 //Paths de Firestore.
 export const FIRESTORE_PATHS = Object.freeze({
     DETECTION_POINTS: detectionPoints,
+})
+
+//Maps
+export const GOOGLE_MAPS = Object.freeze({
+    API_KEY: env('VITE_GOOGLE_MAPS_API_KEY'),
 })

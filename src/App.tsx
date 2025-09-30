@@ -1,33 +1,31 @@
-import { useEffect, useState } from "react";
+import { useAuth } from "./hooks/useAuth";
 import { useGraph } from "./hooks/useGraph";
-import { loginWithEmail } from "./firebase/auth";
+import MapGraph from "./components/MapGraph";
+import { useMemo, useState } from "react";
 
 
+/**
+ * muestra estado de sesión, carga puntos/edges y dibuja el mapa.
+ * @returns El componente principal
+ */
 export default function App() {
 
   // Para saber si el auth está listo
-  const [ready, setReady] = useState(false);
-  const [authErr, setAuthErr] = useState<Error | null>(null);
-
-  // Lee credenciales del entorno SOLO si las configuraste (útil en dev).
-  const userMail = import.meta.env.VITE_FIREBASE_AUTH_EMAIL as string | undefined;
-  const userPass = import.meta.env.VITE_FIREBASE_AUTH_PASSWORD as string | undefined;
-
-  useEffect(() => {
-    (async () => {
-      try {
-        if (userMail && userPass) {
-          await loginWithEmail(userMail, userPass);
-        }
-        setReady(true);
-      } catch (e) {
-        setAuthErr(e as Error);
-      }
-    })();
-  }, [userMail, userPass]);
-
+  const { user, ready, error: authErr } = useAuth();
   const { points, edges, loading, error } = useGraph();
 
+  // UI, toggles de capas y auto-fit
+  const [showPoints, setShowPoints] = useState(true);
+  const [showEdges, setShowEdges] = useState(true);
+  const [fitOnLoad, setFitOnLoad] = useState(true);
+
+  // Stats simples para mostrar en el header
+  const stats = useMemo(
+    () => ({ nPoints: points.length, nEdges: edges.length }),
+    [points, edges]
+  );
+
+  // Auth error
   if (authErr) {
     return (
       <div style={{ padding: 16, color: "crimson" }}>
@@ -36,31 +34,94 @@ export default function App() {
     );
   }
 
+  // Loading
   if (!ready) {
     return <div style={{ padding: 16 }}>Iniciando sesión…</div>;
   }
 
-  // Aquí podrías renderizar tu <MapGraph /> si ya lo tienes:
-  // <MapGraph points={points} edges={edges} showPoints showEdges fitOnLoad />
-
-  
   return (
-    <div style={{ padding: 16 }}>
-      <h1>Grid Guardian — Demo (carga 1 listener)</h1>
+    <div
+      style={{
+        height: "100dvh",
+        display: "grid",
+        gridTemplateRows: "auto 1fr",
+      }}
+    >
+      {/* Header con controles y estado */}
+      <header
+        style={{
+          padding: "10px 14px",
+          display: "flex",
+          gap: 16,
+          alignItems: "center",
+          flexWrap: "wrap",
+          borderBottom: "1px solid #e5e7eb",
+        }}
+      >
+        <b>Grid Guardian — Mapa</b>
 
-      {loading && <div>Cargando puntos…</div>}
-      {error && <div style={{ color: "crimson" }}>Error: {String(error.message || error)}</div>}
+        <span style={{ opacity: 0.8 }}>
+          Sesión: <b>{user ? user.email : "anónimo"}</b>
+        </span>
 
-      {!loading && !error && (
-        <>
-          <p>
-            Puntos: <b>{points.length}</b> · Conexiones: <b>{edges.length}</b>
-          </p>
-          <pre style={{ background: "#f6f7f9", padding: 12, borderRadius: 8, maxHeight: 300, overflow: "auto" }}>
-            {JSON.stringify({ points, edges }, null, 2)}
-          </pre>
-        </>
-      )}
+        <label style={{ display: "flex", gap: 6, alignItems: "center" }}>
+          <input
+            type="checkbox"
+            checked={showPoints}
+            onChange={(e) => setShowPoints(e.target.checked)}
+          />
+          Puntos
+        </label>
+
+        <label style={{ display: "flex", gap: 6, alignItems: "center" }}>
+          <input
+            type="checkbox"
+            checked={showEdges}
+            onChange={(e) => setShowEdges(e.target.checked)}
+          />
+          Conexiones
+        </label>
+
+        <label style={{ display: "flex", gap: 6, alignItems: "center" }}>
+          <input
+            type="checkbox"
+            checked={fitOnLoad}
+            onChange={(e) => setFitOnLoad(e.target.checked)}
+            title="Ajustar vista automáticamente cuando cambian datos o toggles"
+          />
+          Auto-fit
+        </label>
+
+        <span style={{ opacity: 0.8 }}>
+          {loading
+            ? "Cargando puntos…"
+            : `Puntos: ${stats.nPoints} · Conexiones: ${stats.nEdges}`}
+        </span>
+
+        {error && (
+          <span style={{ color: "crimson" }}>
+            Error: {String(error.message || error)}
+          </span>
+        )}
+      </header>
+
+      {/* Cuerpo: mapa o fallback */}
+      <main>
+        {!loading && !error ? (
+          <MapGraph
+            points={points}
+            edges={edges}
+            showPoints={showPoints}
+            showEdges={showEdges}
+            fitOnLoad={fitOnLoad}
+          />
+        ) : (
+          // Fallback simple mientras carga / si hay error ya se ve en el header
+          <div style={{ padding: 16 }}>
+            {loading ? "Preparando el mapa…" : null}
+          </div>
+        )}
+      </main>
     </div>
   );
 }

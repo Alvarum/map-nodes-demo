@@ -11,9 +11,9 @@ import type { Unsubscribe } from "firebase/auth";
 
 /**
  * Hook que:
- * - Escucha el estado de Firebase Auth (user, login/logout).
- * - Intenta auto-login si existen VITE_FIREBASE_AUTH_EMAIL/PASSWORD.
- * - Expone { user, ready, error } para que la UI no dependa de side-effects.
+ * Escucha el estado de Firebase Auth (user, login/logout).
+ * Intenta auto-login si existen VITE_FIREBASE_AUTH_EMAIL/PASSWORD.
+ * Expone { user, ready, error } para que la UI no dependa de side-effects.
  */
 export function useAuth() {
   // Usuario

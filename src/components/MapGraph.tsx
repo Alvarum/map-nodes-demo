@@ -11,7 +11,7 @@ import type { DetectionPoint, MapGraphProps } from "../types/interfaces";
 import { GOOGLE_MAPS } from "../helpers/privateData";
 
 // estilo del mapa en css (creo que se puede mover a un archivo css, ver después)
-const containerStyle: CSSProperties = { width: "100%", height: "70vh" };
+const containerStyle: CSSProperties = { width: "100%", height: "100%" };
 // coordenadas iniciales
 const defaultCenter: google.maps.LatLngLiteral = { lat: -15, lng: -60 };
 // zoom inicial

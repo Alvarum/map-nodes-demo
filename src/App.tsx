@@ -106,17 +106,18 @@ export default function App() {
       </header>
 
       {/* Cuerpo: mapa o fallback */}
-      <main>
+      <main style={{ height: "100%", width: "100%", display: "flex" }}>
         {!loading && !error ? (
-          <MapGraph
-            points={points}
-            edges={edges}
-            showPoints={showPoints}
-            showEdges={showEdges}
-            fitOnLoad={fitOnLoad}
-          />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <MapGraph
+              points={points}
+              edges={edges}
+              showPoints={showPoints}
+              showEdges={showEdges}
+              fitOnLoad={fitOnLoad}
+            />
+          </div>
         ) : (
-          // Fallback simple mientras carga / si hay error ya se ve en el header
           <div style={{ padding: 16 }}>
             {loading ? "Preparando el mapa…" : null}
           </div>

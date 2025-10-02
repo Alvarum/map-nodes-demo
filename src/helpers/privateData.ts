@@ -8,7 +8,7 @@ const detectionPointsStr: string = env(
     "VITE_DETECTION_POINTS",
     "string"
 );
-const detectionPoints = toSegments(detectionPointsStr);
+const detectionPoints: readonly string[] = toSegments(detectionPointsStr);
 
 //Configuración de Firebase
 export const FIREBASE_CONFIG: FirebaseOptions = {
@@ -19,17 +19,22 @@ export const FIREBASE_CONFIG: FirebaseOptions = {
 };
 
 // Credenciales de autenticación en desarrollo (las propias)
-export const DEV_AUTH = Object.freeze({
+export const DEV_AUTH: Record<string, string> = Object.freeze({
   email: env('VITE_FIREBASE_AUTH_EMAIL'),
   password: env('VITE_FIREBASE_AUTH_PASSWORD'),
 });
 
 //Paths de Firestore.
-export const FIRESTORE_PATHS = Object.freeze({
+export const FIRESTORE_PATHS: Record<string, readonly string[]> = Object.freeze({
     DETECTION_POINTS: detectionPoints,
 })
 
 //Maps
-export const GOOGLE_MAPS = Object.freeze({
+export const GOOGLE_MAPS: Record<string, string> = Object.freeze({
     API_KEY: env('VITE_GOOGLE_MAPS_API_KEY'),
+})
+
+//Path locales de los iconos
+export const ICONS: Record<string, string> = Object.freeze({
+    GREENCIRCLE: 'icons/green.png',
 })

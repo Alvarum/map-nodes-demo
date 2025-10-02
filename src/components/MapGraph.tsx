@@ -1,29 +1,48 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import type { CSSProperties } from "react";
+import {
+  useEffect,
+  useRef,
+  useState
+} from "react";
 import {
   GoogleMap,
-  Marker, // pa los pines
-  Polyline, // este maricon sirve para hacer lineas en el mapa
+  Marker,
+  Polyline,
   InfoWindow,
   useJsApiLoader,
 } from "@react-google-maps/api";
-import type { DetectionPoint, MapGraphProps } from "../types/interfaces";
-import { GOOGLE_MAPS } from "../helpers/privateData";
+import {
+  lineOptions,
+  mapOptions,
+  containerStyle,
+  defaultCenter,
+  defaultZoom,
+  makeIcon
+} from "../config/gmaps";
+import {
+  GOOGLE_MAPS,
+  ICONS
+} from "../helpers/privateData";
+import type {
+  DetectionPoint,
+  MapGraphProps
+} from "../types/interfaces";
 
-// estilo del mapa en css (creo que se puede mover a un archivo css, ver después)
-const containerStyle: CSSProperties = { width: "100%", height: "100%" };
-// coordenadas iniciales
-const defaultCenter: google.maps.LatLngLiteral = { lat: -15, lng: -60 };
-// zoom inicial
-const defaultZoom: number = 4;
 
 // componente principal
 export default function MapGraph(
-  {points, edges, showPoints = true, showEdges = true, fitOnLoad = true}: MapGraphProps
+  {
+    points,
+    edges,
+    showPoints = true,
+    showEdges = true,
+    fitOnLoad = true
+  }: MapGraphProps
 ){
 
   // Referencia donde se instancia el map
-  const mapRef = useRef<google.maps.Map | null>(null);
+  const mapRef: React.RefObject<google.maps.Map | null> = (
+    useRef<google.maps.Map | null>(null)
+  );
 
   // Selección de un punto
   const [selected, setSelected] = useState<DetectionPoint | null>(null);
@@ -34,23 +53,24 @@ export default function MapGraph(
     googleMapsApiKey: GOOGLE_MAPS.API_KEY,
   });
 
+
   // Auto ajusta el mapa
   useEffect(() => {
-    // si no se ha cargado el mapa, no hace nada
+    // Si no se ha cargado el mapa, no hace narinas
     if (!isLoaded || !mapRef.current || !fitOnLoad) return;
 
-    // obtiene el mapa
-    const map = mapRef.current;
+    // Obtiene el mapa
+    const map: google.maps.Map = mapRef.current;
     // Revisa si hay puntos de detección
-    const hasPts = showPoints && points.length > 0;
+    const hasPts: boolean = showPoints && points.length > 0;
     // Revisa si hay aristas
-    const hasEdg = showEdges && edges.length > 0;
+    const hasEdg: boolean = showEdges && edges.length > 0;
 
     // si no hay nada que mostrar, no hace nada
     if (!hasPts && !hasEdg) return;
 
     // enlaces
-    const bounds = new google.maps.LatLngBounds();
+    const bounds: google.maps.LatLngBounds = new google.maps.LatLngBounds();
 
     // Si hay puntos de detección, los agrega al bounds por sus coordenadas
     if (hasPts) for (const p of points) bounds.extend({ lat: p.lat, lng: p.lng });
@@ -58,35 +78,37 @@ export default function MapGraph(
     // Si hay aristas, las agrega al bounds por sus coordenadas
     if (hasEdg) {
       for (const e of edges) {
-        bounds.extend({ lat: e.a.lat, lng: e.a.lng });
-        bounds.extend({ lat: e.b.lat, lng: e.b.lng });
+        bounds.extend({
+          lat: e.a.lat,
+          lng: e.a.lng
+        });
+        bounds.extend({
+          lat: e.b.lat,
+          lng: e.b.lng
+        });
       }
     }
 
     // Ajusta el mapa
     map.fitBounds(bounds, 64);
-  }, [isLoaded, points, edges, showPoints, showEdges, fitOnLoad]);
-
-  // Opciones de los poligonos y guarda en memoria
-  const lineOptions = useMemo<google.maps.PolylineOptions>(
-    () => ({ strokeOpacity: 0.85, strokeWeight: 2, clickable: false }),
-    []
-  );
+  },[
+      isLoaded,
+      points,
+      edges,
+      showPoints,
+      showEdges,
+      fitOnLoad
+    ]);
 
   // Render
   return isLoaded ? (
-    // si está cargado ya el mapa lo muestra
+    // Si está cargado ya el mapa ps lo muestra
     <GoogleMap
       onLoad={(m) => { mapRef.current = m; }}
       mapContainerStyle={containerStyle}
       center={defaultCenter}
       zoom={defaultZoom}
-      options={{
-        streetViewControl: false,
-        fullscreenControl: false,
-        mapTypeControl: false,
-        minZoom: 3 
-      }}
+      options={mapOptions}
       onClick={() => setSelected(null)}
     >
       {showEdges &&
@@ -108,6 +130,7 @@ export default function MapGraph(
             position={{ lat: p.lat, lng: p.lng }}
             title={`${p.name} (${p.id})`}
             onClick={() => setSelected(p)}
+            icon={makeIcon(ICONS.GREENCIRCLE, 8)}
           />
         ))}
 
@@ -116,9 +139,9 @@ export default function MapGraph(
           position={{ lat: selected.lat, lng: selected.lng }}
           onCloseClick={() => setSelected(null)}
         >
-          <div style={{ maxWidth: 280 }}>
-            <h3 style={{ margin: "0 0 6px" }}>{selected.name}</h3>
-            <div style={{ fontSize: 14 }}>
+          <div style={{ maxWidth: 680 }}>
+            <h3 style={{ margin: "0 0 6px", color: "#444" }}>{selected.name.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase())}</h3>
+            <div style={{ fontSize: 14, color: "#444" }}>
               <b>Vecinos:</b>{" "}
               {selected.neighbors.length ? selected.neighbors.join(", ") : "Ninguno"}
             </div>

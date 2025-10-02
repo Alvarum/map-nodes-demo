@@ -1,7 +1,7 @@
 import { useAuth } from "./hooks/useAuth";
 import { useGraph } from "./hooks/useGraph";
-import MapGraph from "./components/MapGraph";
 import { useMemo, useState } from "react";
+import MapGraph from "./components/MapGraph";
 
 
 /**
@@ -20,10 +20,13 @@ export default function App() {
   const [fitOnLoad, setFitOnLoad] = useState(true);
 
   // Stats simples para mostrar en el header
-  const stats = useMemo(
-    () => ({ nPoints: points.length, nEdges: edges.length }),
-    [points, edges]
+  const stats: { nPoints: number; nEdges: number } = useMemo(
+    () => ({
+      nPoints: points.length,
+      nEdges: edges.length
+    }), [points, edges]
   );
+
 
   // Auth error
   if (authErr) {
@@ -39,6 +42,7 @@ export default function App() {
     return <div style={{ padding: 16 }}>Iniciando sesión…</div>;
   }
 
+  // UI
   return (
     <div
       style={{
@@ -47,7 +51,7 @@ export default function App() {
         gridTemplateRows: "auto 1fr",
       }}
     >
-      {/* Header con controles y estado */}
+      {/* Header con controles estado, stats y login */}
       <header
         style={{
           padding: "10px 14px",
@@ -64,7 +68,11 @@ export default function App() {
           Sesión: <b>{user ? user.email : "anónimo"}</b>
         </span>
 
-        <label style={{ display: "flex", gap: 6, alignItems: "center" }}>
+        <label style={{
+          display: "flex",
+          gap: 6,
+          alignItems: "center"
+        }}>
           <input
             type="checkbox"
             checked={showPoints}
@@ -73,7 +81,11 @@ export default function App() {
           Puntos
         </label>
 
-        <label style={{ display: "flex", gap: 6, alignItems: "center" }}>
+        <label style={{
+          display: "flex",
+          gap: 6,
+          alignItems: "center"
+        }}>
           <input
             type="checkbox"
             checked={showEdges}
@@ -82,7 +94,11 @@ export default function App() {
           Conexiones
         </label>
 
-        <label style={{ display: "flex", gap: 6, alignItems: "center" }}>
+        <label style={{
+          display: "flex",
+          gap: 6,
+          alignItems: "center"
+        }}>
           <input
             type="checkbox"
             checked={fitOnLoad}
@@ -94,7 +110,7 @@ export default function App() {
 
         <span style={{ opacity: 0.8 }}>
           {loading
-            ? "Cargando puntos…"
+            ? "Cargando puntos de detección"
             : `Puntos: ${stats.nPoints} · Conexiones: ${stats.nEdges}`}
         </span>
 
@@ -106,7 +122,11 @@ export default function App() {
       </header>
 
       {/* Cuerpo: mapa o fallback */}
-      <main style={{ height: "100%", width: "100%", display: "flex" }}>
+      <main style={{
+        height: "100%",
+        width: "100%",
+        display: "flex"
+      }}>
         {!loading && !error ? (
           <div style={{ flex: 1, minWidth: 0 }}>
             <MapGraph
